@@ -1,8 +1,12 @@
+// @ts-ignore
 import Canvas from "canvas";
 import path from "path";
 import fs from "fs";
+// @ts-ignore
 import VMind, { ChartType, DataTable } from "@visactor/vmind";
+// @ts-ignore
 import VChart from "@visactor/vchart";
+// @ts-ignore
 import { isString } from "@visactor/vutils";
 
 enum AlgorithmType {

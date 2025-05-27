@@ -1,7 +1,7 @@
 import asyncio
 import json
 import os
-from typing import Any, Hashable
+from typing import Any, Hashable, Dict
 
 import pandas as pd
 from pydantic import Field, model_validator
@@ -93,7 +93,7 @@ Outputs:
 
     async def data_visualization(
         self, json_info: list[dict[str, str]], output_type: str, language: str
-    ) -> str:
+    ) -> Dict:
         data_list = []
         csv_file_path = self.get_file_path(json_info, "csvFilePath")
         for index, item in enumerate(json_info):
@@ -138,8 +138,9 @@ Outputs:
                     }
                 )
         if len(error_list) > 0:
+            errors = '\n'.join(error_list)
             return {
-                "observation": f"# Error chart generated{'\n'.join(error_list)}\n{self.success_output_template(success_list)}",
+                "observation": f"# Error chart generated{errors}\n{self.success_output_template(success_list)}",
                 "success": False,
             }
         else:
@@ -147,7 +148,7 @@ Outputs:
 
     async def add_insighs(
         self, json_info: list[dict[str, str]], output_type: str
-    ) -> str:
+    ) -> Dict:
         data_list = []
         chart_file_path = self.get_file_path(
             json_info, "chartPath", os.path.join(config.workspace_root, "visualization")
@@ -186,8 +187,9 @@ Outputs:
             else ""
         )
         if len(error_list) > 0:
+            errors = '\n'.join(error_list)
             return {
-                "observation": f"# Error in chart insights:{'\n'.join(error_list)}\n{success_template}",
+                "observation": f"# Error in chart insights:{errors}\n{success_template}",
                 "success": False,
             }
         else:
