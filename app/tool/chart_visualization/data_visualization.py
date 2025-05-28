@@ -201,7 +201,7 @@ Outputs:
         output_type: str | None = "html",
         tool_type: str | None = "visualization",
         language: str | None = "en",
-    ) -> str:
+    ) -> Dict:
         try:
             logger.info(f"📈 data_visualization with {json_path} in: {tool_type} ")
             with open(json_path, "r", encoding="utf-8") as file:
@@ -225,7 +225,8 @@ Outputs:
         dict_data: list[dict[Hashable, Any]] = None,
         chart_description: str = None,
         language: str = "en",
-    ):
+        ts_path: str = "src/chartVisualize.ts",
+    ) -> Dict:
         llm_config = {
             "base_url": self.llm.base_url,
             "model": self.llm.model,
@@ -246,7 +247,7 @@ Outputs:
         process = await asyncio.create_subprocess_exec(
             "npx",
             "ts-node",
-            "src/chartVisualize.ts",
+            ts_path,
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
