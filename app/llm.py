@@ -1,4 +1,5 @@
 import math
+import json
 from typing import Dict, List, Optional, Union
 
 import tiktoken
@@ -196,6 +197,9 @@ class LLM:
             self.api_key = llm_config.api_key
             self.api_version = llm_config.api_version
             self.base_url = llm_config.base_url
+            self.bk_app_code = llm_config.bk_app_code
+            self.bk_app_secret = llm_config.bk_app_secret
+            self.bk_username = llm_config.bk_username
 
             # Add token counting related attributes
             self.total_input_tokens = 0
@@ -221,6 +225,18 @@ class LLM:
                 )
             elif self.api_type == "aws":
                 self.client = BedrockClient()
+            elif self.api_type == "bk":
+                self.client = AsyncOpenAI(
+                    base_url=self.base_url,
+                    api_key=self.api_key,
+                    default_headers={
+                        "X-Bkapi-Authorization": json.dumps({
+                            "bk_app_code": self.bk_app_code,
+                            "bk_app_secret": self.bk_app_secret,
+                            "bk_username": self.bk_username,
+                        })
+                    }
+                )
             else:
                 self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
 
@@ -735,7 +751,7 @@ class LLM:
 
             # Check if response is valid
             if not response.choices or not response.choices[0].message:
-                print(response)
+                logger.debug(response)
                 # raise ValueError("Invalid or empty response from LLM")
                 return None
 
