@@ -1,3 +1,4 @@
+import time
 from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from typing import List, Optional
@@ -41,6 +42,8 @@ class BaseAgent(BaseModel, ABC):
     current_step: int = Field(default=0, description="Current step in execution")
 
     duplicate_threshold: int = 2
+
+    interval: float = 0.2
 
     class Config:
         arbitrary_types_allowed = True
@@ -145,6 +148,7 @@ class BaseAgent(BaseModel, ABC):
                     self.handle_stuck_state()
 
                 results.append(f"Step {self.current_step}: {step_result}")
+                time.sleep(self.interval)
 
             if self.current_step >= self.max_steps:
                 self.current_step = 0

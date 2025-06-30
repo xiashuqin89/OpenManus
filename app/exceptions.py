@@ -13,8 +13,8 @@ class TokenLimitExceeded(OpenManusError):
     """Exception raised when the token limit is exceeded"""
 
 
-class ApiError(Exception, RuntimeError):
-    pass
+class ApiError(Exception):
+    """Base exception for all API errors"""
 
 
 class HttpFailed(ApiError):
@@ -40,5 +40,13 @@ class ActionFailed(ApiError):
         self.info = info
 
 
-class NetworkError(Exception, IOError):
+class NetworkError(Exception):
+    pass
+
+
+class TokenNotAvailable(ApiError):
+    pass
+
+
+class ApiNotAvailable(ApiError):
     pass

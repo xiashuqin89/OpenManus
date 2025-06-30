@@ -2,7 +2,7 @@ import json
 import threading
 import tomllib
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Literal
 
 from pydantic import BaseModel, Field
 
@@ -28,6 +28,10 @@ class LLMSettings(BaseModel):
     temperature: float = Field(1.0, description="Sampling temperature")
     api_type: str = Field(..., description="Azure, Openai, or Ollama")
     api_version: str = Field(..., description="Azure Openai version if AzureOpenai")
+    # bk
+    bk_app_code: str = Field(..., description="bk app code from bk platform")
+    bk_app_secret: str = Field(..., description="bk app secret from bk platform")
+    bk_username: str = Field(..., description="bk username from bk platform")
 
 
 class ProxySettings(BaseModel):
@@ -146,6 +150,13 @@ class MCPSettings(BaseModel):
             raise ValueError(f"Failed to load MCP server config: {e}")
 
 
+class BKSettings(BaseModel):
+    product: List[Literal["bkmonitorv3", "bk-data", "bk-cmdb"]] = Field(..., description="product list")
+    api_root: str = Field(default="https://{product}.apigw.o.woa.com/prod/", description="API Root")
+    bk_app_code: str = Field(..., description="SaaS bk_app_code")
+    bk_app_secret: str = Field(..., description="SaaS bk_app_secret")
+
+
 class AppConfig(BaseModel):
     llm: Dict[str, LLMSettings]
     sandbox: Optional[SandboxSettings] = Field(
@@ -158,6 +169,7 @@ class AppConfig(BaseModel):
         None, description="Search configuration"
     )
     mcp_config: Optional[MCPSettings] = Field(None, description="MCP configuration")
+    bk_config: Optional[BKSettings] = Field(None, description="BK configuration")
 
     class Config:
         arbitrary_types_allowed = True
@@ -215,6 +227,10 @@ class Config:
             "temperature": base_llm.get("temperature", 1.0),
             "api_type": base_llm.get("api_type", ""),
             "api_version": base_llm.get("api_version", ""),
+            # bk
+            "bk_app_code": base_llm.get("bk_app_code", ""),
+            "bk_app_secret": base_llm.get("bk_app_secret", ""),
+            "bk_username": base_llm.get("bk_username", ""),
         }
 
         # handle browser config.
@@ -269,6 +285,9 @@ class Config:
         else:
             mcp_settings = MCPSettings(servers=MCPSettings.load_server_config())
 
+        bk_config = raw_config.get("bk", {})
+        bk_settings = BKSettings(**bk_config) if bk_config else None
+
         config_dict = {
             "llm": {
                 "default": default_settings,
@@ -281,6 +300,7 @@ class Config:
             "browser_config": browser_settings,
             "search_config": search_settings,
             "mcp_config": mcp_settings,
+            "bk_config": bk_settings,
         }
 
         self._config = AppConfig(**config_dict)
@@ -305,6 +325,11 @@ class Config:
     def mcp_config(self) -> MCPSettings:
         """Get the MCP configuration"""
         return self._config.mcp_config
+
+    @property
+    def bk_config(self) -> BKSettings:
+        """Get the MCP configuration"""
+        return self._config.bk_config
 
     @property
     def workspace_root(self) -> Path:
