@@ -152,7 +152,7 @@ class MCPSettings(BaseModel):
 
 class BKSettings(BaseModel):
     product: List[Literal["bkmonitorv3", "bk-data", "bk-cmdb"]] = Field(..., description="product list")
-    api_root: str = Field(default="https://{product}.apigw.o.woa.com/prod/", description="api root")
+    api_root: str = Field(default="", description="api root")
     bk_app_code: str = Field(..., description="SaaS bk_app_code")
     bk_app_secret: str = Field(..., description="SaaS bk_app_secret")
 
