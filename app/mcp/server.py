@@ -1,9 +1,5 @@
 import logging
 import sys
-
-
-logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler(sys.stderr)])
-
 import argparse
 import asyncio
 import atexit
@@ -19,6 +15,8 @@ from app.tool.bash import Bash
 from app.tool.browser_use_tool import BrowserUseTool
 from app.tool.str_replace_editor import StrReplaceEditor
 from app.tool.terminate import Terminate
+
+logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler(sys.stderr)])
 
 
 class MCPServer:
